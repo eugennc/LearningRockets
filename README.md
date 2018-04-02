@@ -8,4 +8,4 @@ Please read the forStudents.txt and codingConventions.txt files.
 Please read the codingConvetions.txt files.
 
 ## Requirements
-A C++ compiler, the development files for [SDL2] (https://www.libsdl.org/) and [GLEW2] (http://glew.sourceforge.net/), GNU Makefile.
+A C++ compiler, the development files for [SDL2](https://www.libsdl.org/) and [GLEW2](http://glew.sourceforge.net/), GNU Makefile.
