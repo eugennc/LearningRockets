@@ -1,0 +1,86 @@
+ - No tabs are used. Indent size is 2 spaces.
+
+ - protected, private and public keywords are only indented 1 space.
+
+ - namespaces do not increase indentation:
+namespace bar{
+Class C {};
+}
+
+ - comments are not wrapped. Best use a line-wrapping IDE
+
+ - camelCase is being used. Acronyms may have, at most, their first letter capitalised:
+variableName		not VariableName
+constName
+somethingOglRelated	not somethingOGLRelated
+oglRelatedVariable	not OglRelatedVariable
+
+ - enum members are named like variables
+
+ - classes, structs and custom types have their first letter capitalised. Class instances follow general variable naming.
+Class ClassName {}; ClassName className;
+
+ - do typedef oft-used very long types:
+typedef std::vector< std::string > StringVect;
+
+ - In the above example: be aware that C++ relational syntax is inverse from English. 
+C++ syntax maps to English prepositional syntax: vector< string > is a 'vector of strings' or a 'string vector'.
+
+ - all filenames start lowercase: ClassName resides in className.h and className.cpp
+
+ - member data in classes (but not in structs) start with m_ :
+Class A {
+ protected:
+  float m_value;
+
+ public:
+  A();
+  float getValue();
+};
+
+ - static constants in classes start with k_.
+
+ - name conventions are overriden by mathematical standardised conventions. For instance, the gravitational constant G will be k_G, not k_g.
+
+ - Well-known names for certain variables and constants are _more precise_ than long names. Thus, k_G is a better name than k_gravitationalConstant, due to its widespread use in physics.
+
+- try to separate public, protected and private blocks inside a class definition with an empty line (as above). Inside such blocks, separate data and functions with an empty line.
+
+ - Code blocks are delimited like 1TS, with 1 space before { :
+for(;;) {	not	for(;;)		nor 	for(;;){
+}			{			}
+			}
+
+ - function blocks are delimited the same way:
+void foo() {
+}
+
+ - relatively small structs which are being used exclusively by or together with the classes using them are declared inside that class. 
+If relatively small, struct member functions can also reside in the .h file.
+
+- one- and two-liner member functions can reside in the .h file. If entirely not surprising, their code can be on the same line as the definition:
+float getValue() { return m_value; }
+void setValue(float value) { m_value = value; updateSecondaryValues(); }
+
+- do try to comment your code. Do try to have explicit names for variables. 
+
+- do try to use enums instead of numbers.
+
+- unary operators are not space - separated from their operands. Binary operators are (except hierachical operators, like :: . and ->).
+if(!val) 		not if ( !val )		nor if(! val)
+w = u * v;		not w=u*v;
+a = avg(v1, v2);	not a = avg(v1,v2);
+A::a->f().b()		not A :: a -> f() . b()
+
+- if putting space in templates, have the spacing for both angular parantheses:
+vector< vector<bool> >		not vector<vector<bool> >	nor vector<vector<bool>>  preferably not  vector< vector< bool > >
+
+- spacing << and >> during cout is entirely dependant on the readability of the code. In general:
+cout<<"a: "<<5;
+is entirely readable and ok. (the shape of the << and >> operators often provides separation enough). 
+
+- using () to make operator order apparent is generally a good idea. If there would be too many parens, then probably it would be better to split the expression in pieces.
+
+- do not "using namespace" in .h files. Do use it in .cpp files, to make the code more readable.
+
+- place structure in .h files. Place logic in .cpp files.

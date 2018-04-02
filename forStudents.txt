@@ -1,0 +1,63 @@
+This project is meant as a proof-of-concept implementation of basic accelerated rendering in OpenGL. It touches the following topics:
+ - Accelerated graphical rendering through the use of Vertex Buffer Objects (VBOs).
+ - Loading and rendering textures.
+ - Loading and rendering 3d geometry formats (in this case, the very simple .obj format).
+ - Putting together geometry (vertices, with their positions and order) and textures, in order to render a coherent image.
+ - Working with an external utility library (sdl2). Implementing an event loop similar to that provided by GLUT.
+ - Working with additional OpenGL libraries (glext, glew).
+ - Basic physics simulation.
+
+The tasks for this project are divided in two categories, general and unique.
+ - The general tasks can be accomplished by any number of teams.
+ - The unique tasks cannot be undertaken by more than one team. Talk to Croitoru Eugen for unique task assignment.
+ - All students and teams can propose different tasks than those outlined below. Talk to Croitoru Eugen if you want to do a task not presented here.
+
+General tasks:
+ ! the basic general task, common and absolutely essential to all other tasks (general and unique), is to understand the project, in rough detail, and be able to compile and run the project. 
+ The project is written in C++98, and uses the following libraries:
+   - OpenGL (ideally at least version 2.1), but tested on OpenGL 1.3
+   - glu.h (part of OpenGL)
+   - glext.h (part of OpenGL)
+   - glew.h (http://glew.sourceforge.net/)
+   - SDL2 (https://www.libsdl.org/download-2.0.php)
+   Additionally, a video card and driver capable of using VBOs are required.
+   
+ - the second part of a general task is to understand and explain a smaller part of the project, in better detail:
+   - Class ObjLoader : data structures, the parse*() functions, and the .obj file format
+   - Class Vector3 , ObjLoader::computeMinMax() and ObjLoader::normaliseAndCenter()
+   - the SceneObject and Scene classes. Physics computation, discrete-time integrals.
+   - VBOs: generating VBOs (OglDataCache::loadGlTexture(), OglDataCache::loadObject()), destroying VBOs (~OglDataCache()), and rendering them (OglDataCache::renderObject())
+   - basic engine: the event loop (Engine::run()), SDL2 and OpenGL initialisation (init and initGl()), render wrapper (Engine::render())
+
+A team able to build and run the project, answer general questions about it, and answer particular questions about your chosen topic will receive 1 point. A team can only choose to do, at most, a single general task.
+
+Unique tasks: these tasks require modifying the project. They are valued between 3 and 4 points, as written down at the start of the task.
+ - 4: Modify Class ObjLoader, Class OglDataCache in order to load and render .obj files with a variable number of vertices per face.
+ - 4: Load and render materials as well (material shaders).
+ - 3: Implement a loader for a new 3d format. +1 point: write texture loaders for 2 additional graphics formats.
+ - 4: Vertices, Texture Coordinates and Normals are loaded in 3 different VBOs for a single object. Modify the project to load all those in a single VBO, and render it properly.
+ - 4: Create a Graphical User Interface, showing a menu with 'Start' and 'Quit' and different status-related numbers (i.e. distance between apriori chosen bodies, certain object's orientation, relative speed).
+ - 4: Implement accurate simulation of rotation in Class SceneObject. Implementing Class Quaternion advised.
+ - 3: Implement sphere-based collision-detection. +1p: Implement convex-object collision detection.
+ - 3: Have the Scene set-up be described in a text file, and loaded. Replace the scene-related set-up in Engine::Engine() with a call to Engine::loadScene()
+ - 3: make the Moon object look round by adjusting its normals. Advice: creating a high-poly sphere to transfer the normals to the low-poly object might be required (i.e. baking normals). +1p: Create multiple 3d object files and textures. Load them and populate the scene with them.
+ - 3: Create a day-night cycle by adding a star (moving object and light).
+
+If choosing a 3 point task, you can also choose a 1 point general task, even if both cover the same area of the program.
+
+If you have a program of equivalent complexity that have written yourself, you can receive points for it (and the above tasks serve as guidelines in its evaluation).
+
+N.B.: remember to read codingConventions.txt
+
+
+Program Interaction:
+As it stands, launching the program will present a scene with two rockets and a moon. 
+Keyboard interaction controls the gray rocket.
+Keys are as follows:
+Esc - exit program
+z - decrease simulation speed by a factor of 2. By default, the simulation is running 1024 times normal time. log(simulationSpeed) is represented by the number of lines at the bottom of the screen.
+x - double simulation speed.
+a - increase rocket rotation speed(trig. rotation, CCW)
+d - decrease rocket rotation speed(counter-trig. rotation, CW)
+t - instantly set rotation speed to 0
+w - thrust. the rocket will behave as if its engines are firing. For feedback, a constant (with no distance fallouff) yellow light will shine from the rocket. It will be mostly visible on the moon.

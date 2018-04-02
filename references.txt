@@ -1,0 +1,8 @@
+references: 
+nehe.gamedev.net  many OpenGL tutorials, somewhat antiquated, often not cross-platform. Still, very good resource.
+songho.ca	  VBO tutorials, many very good quality OpenGL-related explanations and materials.
+gafferongames.com discrete physics simulation tutorials.
+stackoverflow.com answers to questions, bugs, all with helpful (if limited) code snippets.
+
+
+uses a modified version of the Ares 1 model, made by Michael Carbajal, from NASA.
