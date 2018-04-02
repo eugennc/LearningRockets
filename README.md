@@ -9,3 +9,6 @@ Please read the codingConvetions.txt files.
 
 ## Requirements
 A C++ compiler, the development files for [SDL2](https://www.libsdl.org/) and [GLEW2](http://glew.sourceforge.net/), GNU Makefile.
+
+## Further hints
+On Debian-based GNU/Linux distros, the required library development files are named, at the time of writing, libsdl2-dev and libglew-dev.
