@@ -80,7 +80,8 @@ As it stands, launching the program will present a scene with a rocket and a moo
 Keyboard interaction controls the gray rocket.
 Keys are as follows:
 Esc - exit program
-z - decrease simulation speed by a factor of 2. By default, the simulation is running 1024 times normal time. log(simulationSpeed) is represented by the number of lines at the bottom of the screen.
+z - decrease simulation speed by a factor of 2. By default, the simulation is running 1024 times normal time.
+  log(simulationSpeed) is represented by the number of lines at the bottom of the screen.
 x - double simulation speed.
 a - increase rocket rotation speed(trig. rotation, CCW)
 d - decrease rocket rotation speed(counter-trig. rotation, CW)
