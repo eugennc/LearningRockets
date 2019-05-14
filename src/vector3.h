@@ -52,6 +52,7 @@ class Vector3 {
   bool operator!=(const Vector3 &) const ;
   Vector3 operator+(const Vector3 &);
   Vector3 operator-(const Vector3 &);
+  Vector3 operator-();
 
   Vector3 operator+(const Float &);
   Vector3 operator-(const Float &);

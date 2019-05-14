@@ -88,7 +88,7 @@ DataObject OglDataCache::loadObject(std::string objPath, unsigned int tdI) {
       norm.push_back(o.m_normals[i]);
       norm.push_back(o.m_normals[i + 1]);
       norm.push_back(o.m_normals[i + 2]);
-      ++fIt;      
+      ++fIt;
     }
     vn = vert.size() / 3; // each vertex has 3 coordinates
     vArraySize = sizeof(GLfloat) * vert.size();

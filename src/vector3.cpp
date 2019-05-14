@@ -124,6 +124,12 @@ Vector3 Vector3::operator-(const Vector3 &rhs) {
   return Vector3(*this) -= rhs;
 }
 
+Vector3 Vector3::operator-() {
+  return Vector3(-m_x, -m_y, -m_z);
+}
+
+
+
 Vector3 Vector3::operator+(const Float &rhs) {
   return Vector3(*this) += rhs;
 }

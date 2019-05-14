@@ -8,19 +8,20 @@
 
 namespace SdimpleRocket{
 
-  
+
 class Scene {
  protected:
   std::vector< SceneObject > m_objects;
   Float m_time, m_dt; //unit: second; old time and time difference to get in the 'present'
+  Float m_mulDt; //time difference, multiplied
   Float m_timeMul; //time multiplier, for faster / slower simulation
-  Float m_maxFrameTime; //limit the maximum physical computation deltaT, in order to preserve simulation accuracy. millisecond precision.
+  Float m_frameTime; //the length of the simulation time-step
   //virtual camera-related
-  Float m_scale; 
+  Float m_scale;
   Vector3 m_offset;
   //gravitational constant, N * m^2 * kg^-2
   static const Float k_G = 0.000000000066740831;
-  
+
   //center and scale out objects so all the scene has a certain length, so it fits in the view volume
   void updateView(Float maxLength = 2);
   void updateRotation();
@@ -28,9 +29,9 @@ class Scene {
   Vector3 gravity(SceneObject local, SceneObject distant);
   //updatePhysics looks up current m_dt, no need for an argument
   void updatePhysics(bool thrusting);
-  
+
  public:
-  Scene(Float maxFrameTime = 1); //maxFrameTime given in seconds here, stored in milliseconds in engine. Reasoning: second is the SI time measurement unit. However, the engine (chiefly, the SDL functions) relies in millisecond-time.
+  Scene(Float frameTime = 0.1); //maxFrameTime given in seconds here.
 
   void addObject(SceneObject sceneObject);
   void addObject(DataObject object, Vector3 position = Vector3(0, 0, 0), Float size = 1, Float mass = 1, Vector3 velocity = Vector3(0, 0, 0), Float rotation = 0, Float angularVelocity = 0, Vector3 thrust = Vector3());
@@ -39,11 +40,11 @@ class Scene {
   std::vector< SceneObject >::iterator end();
 
   //use this before every frame
-  int nextFrame(GLint dt, bool thrusting = 0);
+  int nextFrame(Float dt, bool thrusting = 0);
 
   //concievably usable by the engine, thus public. Questionable decision. TODO: remove or provide usecase.
-  void updateTime(GLint dt);
-  void resetTime(GLint time = 0);
+  void updateTime(Float dt);
+  void resetTime(Float time = 0);
 
   size_t getObjectCount() { return m_objects.size(); }
   

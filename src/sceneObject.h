@@ -10,7 +10,7 @@
 namespace SdimpleRocket {
   //variable names may depart from being long and precise in the traditional sense; this is not in order to shorten them, but in order to make them _even more precise_: the short names used here are long-standing physics conventions, with precise meanings. Still, outside of physics computations (like get/set), long names will be used
 
-  
+
 struct Light {
   GLuint lightId;
   GLfloat amb[4], dif[4], spe[4];
@@ -22,7 +22,7 @@ struct State {
   Vector3 v; //velocity, meters / second
 };
 
-struct Derivative {
+struct Derivative { //the state derivative
   Vector3 dr; // dr / dt  velocity
   Vector3 dv; // dv / dt  acceleration m/s^2
 };
@@ -35,7 +35,7 @@ class SceneObject {
   Vector3 m_glScale; // object scale; not actual vector, but scale factors on each dimension. Usually, a 3d model should have its longest dimension length (along an axis) as 1 (inscribed in a radius 1 sphere).
   Vector3 m_glRotationAxis; // rotation axis for rotation offset
   Float m_glRotationAngle;  // object rotation around the rotation axis. The rotation is not stored as a vector having a direction and a vector length (for rotational angle) for clarity. Measured in pi-radians. Describes the initial orientation of the model
-  
+
   //physics related
   Float m_size; // The dimension / length multiplier for the object. This, multiplied with the dimensions of the 3d model, yields the 'real-size' object. meters.
   Float m_m; //object mass, kg
@@ -50,25 +50,25 @@ class SceneObject {
   Float m_im; //object inverse mass, kg^{-1}
 
   Vector3 m_force;//the resultant of all forces acting upon this object
-  
+
   //engine
   Vector3 m_thrust; //direction and magnitude of the force produced by the engine upon the object center of mass
   bool m_thrustActive;
 
   void update();
   void updateMass();
-  
+
  public:
   //light related
   bool m_hasLight; //does this body have a lightsource attached?
   Light m_light; // not enough time to properly implement accessor functions, thus public
-  
+
   SceneObject(DataObject object, Vector3 position, Float size, Float mass, Vector3 velocity, Float rotation, Float angularVelocity, Vector3 thrust);
 
   DataObject getDataObject() { return m_object; }
   void setDataObject(DataObject object) { m_object = object; }
-    
-  
+
+
   Vector3 getGlCenterOffset() const { return m_glCenterOffset; }
   void setGlCenterOffset(Vector3 glCenterOffset) { m_glCenterOffset = glCenterOffset; }
   Vector3 getGlScale() const { return m_glScale; }
@@ -81,6 +81,7 @@ class SceneObject {
   void setSize(Float size) { m_size = size; }
   Vector3 getPosition() { return m_state.r; }
   void setPosition(Vector3 position) { m_state.r = position; }
+  void translate(Vector3 deltaR) { m_state.r += deltaR; }
   Float getMass() const { return m_m; }
   void setMass(Float mass) { m_m = mass; updateMass(); }
   Vector3 getVelocity() const { return m_state.v; }
@@ -100,15 +101,21 @@ class SceneObject {
   Vector3 getForce() const { return m_force; }
   void setForce(const Vector3 &force = Vector3()) { m_force = force; }
   void addForce(const Vector3 &force) { m_force += force; }
-  
-  
+  void setAcceleration(const Vector3 &acceleration = Vector3()) { m_derivative.dv = acceleration; }
+  void addAcceleration(const Vector3 &acceleration) { m_derivative.dv += acceleration; }
+
+
   //physics
   Vector3 linearAcceleration(Vector3 force) const;
   Derivative eval(State s, const Derivative d, Float dt, Vector3 force) const ;
+  Derivative evalAccel(State s, const Derivative d, Float dt) const ;
   //move the object affected by a force during a certain time
+  void integrateRk4Accel(Float dt);
   void integrateRk4(Float dt, Vector3 force);
   inline void integrate(Float dt, Vector3 force) { integrateRk4(dt, force); }
   inline void integrate(Float dt) { integrate(dt, m_force); }
+  inline void integrateAccel(Float dt) { integrateRk4Accel(dt); }
+  inline void forceToAccel() { m_derivative.dv += m_force / m_m; }
 
   bool isThrustActive() const { return m_thrustActive; }
   void applyThrust(); //compute thrust according to object rotation, and add it to the forces acting upon the object. Do not integrate yet.

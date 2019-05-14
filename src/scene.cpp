@@ -6,22 +6,23 @@ using namespace SdimpleRocket;
 //moving constant init in constructor, to be visible
 //const Float Scene::k_G = 0.000000000066740831;
 
-Scene::Scene(Float maxFrameTime) {
+Scene::Scene(Float frameTime) {
   resetTime();
-  m_maxFrameTime = maxFrameTime * 1000; //millisecond conversion
+  m_frameTime = frameTime;
   m_timeMul = 1;
   m_scale = 1;
   m_offset = Vector3(0, 0, 0);
 }
 
-void Scene::resetTime(GLint time) {
-  m_time = Float(time) / 1000.0;
+void Scene::resetTime(Float time) {
+  m_time = time;
   m_dt = 0;
+  m_mulDt = 0;
 }
 
-void Scene::updateTime(GLint dt) {
+void Scene::updateTime(Float dt) {
   m_time += m_dt;
-  m_dt = Float(dt) / 1000.0;
+  m_dt = dt;
 }
 
 void Scene::updateRotation() {
@@ -39,6 +40,52 @@ void Scene::updatePhysics(bool thrusting) {
   begin = m_objects.begin();
   end = m_objects.end();
   //we compute all the resultants, then accelerate and move the objects, so that objects stay still while we compute their forces
+  // F = m a; a = F / m;
+  //F_G = K_G * m1 * m2 / r^2;
+  //=> a_G1 = m2 * K_G / r^2;
+  //   a_G2 = m1 * K_G / r^2;
+  Float cache1, r2;
+  Vector3 iiR, r, accel1, accel2;
+
+  for(ii = begin; ii != end; ++ii) {
+    cache1 = k_G * ii->getMass();
+    iiR = ii->getPosition();
+    //thanks to offloading our computations in a function, we can afford to split this for and get rid of a comparison on every iteration
+    ii->setForce();//null resultant force
+    ii->setAcceleration();
+    //since we're iterating over our objects, we can thrust now. Ideally, we'd have a vector<bool> indicating which object is thrusting and which isn't. in the case of multiple thrusters, with multiple settings, it would be a vector< vector<Float> >. Still, this simplest case is proof of concept enough.
+    if(thrusting) {
+      ii->applyThrust();
+      ii->forceToAccel();
+    }
+
+    for(jj = begin; jj != ii; ++jj) {
+      r = jj->getPosition() - iiR;
+      r2 = r.getNorm2();
+      if(r.getNorm() == 0) continue;
+      accel1 = r;
+      accel1.normalise();
+      accel2 = -accel1;
+      accel1 *= k_G * jj->getMass() / r2;
+      accel2 *= cache1 / r2;
+      ii->addAcceleration(accel1);
+      jj->addAcceleration(accel2);
+    }
+  }
+
+  //compute now, _after_ we have gotten the forces for all objects involved
+  for(ii = begin; ii!= end; ++ii) {
+    ii->integrateAccel(m_dt);
+  }
+  updateRotation();
+}
+/*
+void Scene::updatePhysicsSlow(bool thrusting) {
+  //proper way to name interators, I was lazy the rest of the program
+  vector< SceneObject >::iterator begin, end, ii, jj;
+  begin = m_objects.begin();
+  end = m_objects.end();
+  //we compute all the resultants, then accelerate and move the objects, so that objects stay still while we compute their forces
   for(ii = begin; ii != end; ++ii) {
     //thanks to offloading our computations in a function, we can afford to split this for and get rid of a comparison on every iteration
     ii->setForce();//null resultant force
@@ -48,7 +95,7 @@ void Scene::updatePhysics(bool thrusting) {
     for(jj = ii + 1; jj != end; ++jj) {
       ii->addForce(gravity(*ii, *jj));
     }
-    //since we're iterating over out objects, we can thrust now. Ideally, we'd have a vector<bool> indicating which object is thrusting and which isn't. in the case of multiple thrusters, with multiple settings, it would be a vector< vector<Float> >. Still, this simplest case is proof of concept enough. 
+    //since we're iterating over our objects, we can thrust now. Ideally, we'd have a vector<bool> indicating which object is thrusting and which isn't. in the case of multiple thrusters, with multiple settings, it would be a vector< vector<Float> >. Still, this simplest case is proof of concept enough. 
     if(thrusting)
       ii->applyThrust();
   }
@@ -58,6 +105,7 @@ void Scene::updatePhysics(bool thrusting) {
   }
   updateRotation();
 }
+*/
 
 Vector3 Scene::gravity(SceneObject local, SceneObject distant) {
   Vector3 force, r;
@@ -71,23 +119,23 @@ Vector3 Scene::gravity(SceneObject local, SceneObject distant) {
   return force;
 }
 
-int Scene::nextFrame(GLint dt, bool thrusting) {
-  //fixing the time step. We compute each physics step after, at most, a maximum amount of time. 
+int Scene::nextFrame(Float dt, bool thrusting) {
+  //fixing the time step. We compute each physics step after, at most, a maximum amount of time.
   GLint frames = 0;
-  Float mdt = Float(dt) * m_timeMul; //time-multiplied delta-t
-  while(mdt > m_maxFrameTime) { //if our time is greater than the max time a step should take, we break it up into multiple successive steps.
-    updateTime(m_maxFrameTime);
+  m_mulDt += dt * m_timeMul; //time-accelerated delta-t
+  while(m_mulDt > m_frameTime) { //if our time is greater than the max time a step should take, we break it up into multiple successive steps.
+    updateTime(m_frameTime);
     updatePhysics(thrusting);
-    mdt -= m_maxFrameTime;
+    m_mulDt -= m_frameTime;
     ++frames;
   }
-  
-  if(mdt > 0) { //the left-over time is also computed here.
-    updateTime(mdt);
+  /* We do not compute fractional frameTimes. The simulation is more numerically-stable if the time-step is fixed, instead of variable.
+  if(m_mulDt > 0) { //the left-over time is also computed here.
+    updateTime(m_mulDt);
     updatePhysics(thrusting);
-    mdt = 0;
+    m_mulDt = 0;
     ++frames;
-  }
+    }*/
   //we have a horizontal FOV of 90deg, and the camera is positioned at (0, 0, 5). This means that the horizontal length/aperture of the view volume at z = 0 (where we center out scene) is ~around~ 10. In practice, since we apply minimum visual object size, it should be a bit smaller, at least by our minimumSize / 2.
   updateView(9.75);
   return(frames);
@@ -116,18 +164,28 @@ void Scene::updateView(Float maxLength) {
     ++it;
   }
   center = (max + min) / 2.0;
-  m_offset = Vector3() - center;
-    
+  m_offset = -center;
+  //if the center is too far away from (0, 0, 0), we translate all objects in the scene, so we are centered around (0, 0, 0). This is done to use most of the bits in the numbers storing position for intra-scene variance.
+  if(m_offset.getNorm() > 100000) {
+    it = m_objects.begin();
+    while(it != end) {
+      it->translate(m_offset);
+    }
+    m_offset = Vector3();
+    std::cerr<<"Recentered objects.";
+  }
+
+
   len = (max - min).getNorm();
   m_scale = maxLength / len;
 
-    
+
   /*Not really good, no.
   m_scale = maxLength / len;
   center *= m_scale;
   m_offset = center;
   */
-  
+
   //now, visually enlarge objects that are too small to be seen under the current scale
   it = m_objects.begin();
   Float minSize = 0.5;

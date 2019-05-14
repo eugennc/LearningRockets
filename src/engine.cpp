@@ -467,7 +467,7 @@ void Engine::renderUi() {
   glPushMatrix();
   glLoadIdentity();
   //  glOrtho(-1, 1, -1, 1, -1, 1);//we can set up a different perspective in the '2d' UI. It is merely an overlay, and we can still draw 3d objects, if so desired.
-  
+
   //save modelview matrix state, so we can change it here, if needed
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
@@ -499,7 +499,7 @@ void Engine::renderUi() {
   //re-enable and restore previous state
   glEnable(GL_CULL_FACE);
   glEnable(GL_LIGHTING);
-  
+
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
 
@@ -516,7 +516,7 @@ void Engine::render() {
   m_frameTime = time - m_currentTime;
   if(m_frameTime > 100) { //it more than 100 milliseconds passed since the last frame, slow down time accel
     m_scene.setTimeMul(m_scene.getTimeMul() / 2);
-    cout<<"Engine is too slow. Decreasing time multiplicator to "<<m_scene.getTimeMul()<<endl;
+    cout<<"Engine is too slow. Decreasing time multiplier to "<<m_scene.getTimeMul()<<endl;
   }
   //updating current time
   m_currentTime = time;
@@ -531,11 +531,11 @@ void Engine::render() {
     pair<Float, Float> apPe = m_scene.getApPe(1);//get rocket apoapsis and periapsis
     cout<<"Ap: "<<apPe.first<<" Pe: "<<apPe.second<<endl;
   }
-  
+
   Vector3 tv; //temp vector
   Float tf; //temp float
   std::vector< SceneObject >::iterator it, end;
-  
+
   //eh, hack, but the whole rotation is a hack. Quaternions are the way to go.
   // we modify the current rotation speed for the second object
   if((m_resetRotation || m_rotation) && m_scene.getObjectCount() > m_controlledObject) {
@@ -550,7 +550,7 @@ void Engine::render() {
     }
   }
 
-  //Clear The Screen And The Depth Buffer 
+  //Clear The Screen And The Depth Buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -564,15 +564,14 @@ void Engine::render() {
    -----------45d
   */
   glTranslatef(0.0f, 0.0f, -5.0f);
-  
 
   //advance simulation, with a certain time. Also, if our input tells us to apply engine thrust, we pass that to the simulation.
-  m_pFrames += m_scene.nextFrame(m_frameTime, m_thrust);
+  m_pFrames += m_scene.nextFrame(Float(m_frameTime) / 1000.0, m_thrust); //we convert from milliseconds to seconds
 
   //apply the general scene scale. This ensures all objects are small enough to be in frame
   tf = m_scene.getScale();
   glScalef(tf, tf, tf);
-  
+
   //we apply the general scene translation. This centers on the geometric center of all objects (thus, of the scene)
   tv = m_scene.getOffset();
   glTranslatef(tv.getX(), tv.getY(), tv.getZ());
@@ -595,7 +594,7 @@ void Engine::render() {
     //apply glRotation, the correction added to the model
     tf = it->getGlRotationAngle();
     tv = it->getGlRotationAxis();
-    glRotatef(tf, tv.getX(), tv.getY(), tv.getZ()); 
+    glRotatef(tf, tv.getX(), tv.getY(), tv.getZ());
 
     //set object visual scale. It involves object size and the model scale adjustment
     tf = it->getSize(); //we do apply object visual scale adjustment here
