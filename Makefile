@@ -45,3 +45,9 @@ zip: clean
 
 run: $(EXECUTABLE)
 	./$(EXECUTABLE)
+
+perf: $(EXECUTABLE)
+	rm callgrind.out.*
+	valgrind --tool=callgrind ./$(EXECUTABLE)
+	gprof2dot -f callgrind callgrind.out.* | dot -Tsvg -o perf.svg
+	inkscape perf.svg
