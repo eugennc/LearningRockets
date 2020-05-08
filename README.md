@@ -2,7 +2,7 @@
 Small Newtonian-physics rocket simulator, as an example and project for my Computer Graphics students.
 
 ## For students
-Please read the forStudents.txt and codingConventions.txt files.
+Please read the forStudents.txt and codingConventions.txt files. For additional explanations, please consult explanation.pdf, and the enclosed references.
 
 ## For contributors
 Please read the codingConvetions.txt files.
