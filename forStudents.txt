@@ -1,3 +1,4 @@
+For an in-depth explanation, please consult explanation.pdf
 This project is meant as a proof-of-concept implementation of basic accelerated rendering in OpenGL. 
 It touches the following topics:
  - Accelerated graphical rendering through the use of Vertex Buffer Objects (VBOs).
