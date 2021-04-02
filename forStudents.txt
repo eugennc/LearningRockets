@@ -47,7 +47,7 @@ Unique tasks: these tasks require modifying the project. They are valued between
   as written down at the start of the task.
  - 4: Modify Class ObjLoader, Class OglDataCache in order to load and render .obj files 
    with a variable number of vertices per face.
- - 4: Load and render materials as well (material shaders).
+ - 5: Load and render materials as well (material shaders).
  - 3: Implement a loader for a new 3d format. 
    +1 point: write texture loaders for 2 additional graphics formats.
  - 4: Vertices, Texture Coordinates and Normals are loaded in 3 different VBOs for a single object. 
@@ -55,19 +55,22 @@ Unique tasks: these tasks require modifying the project. They are valued between
  - 4: Create a Graphical User Interface, showing a menu with 'Start' and 'Quit' 
    and different status-related numbers (i.e. distance between apriori chosen bodies, 
    certain object's orientation, relative speed).
- - 4: Implement accurate simulation of rotation in Class SceneObject. 
+ - 6: Create a GUI showing detailed orbital information:
+   relative distances, speeds, projecting the orbit forwards and backwards in time, Apoapsis, Periapsis. 
+   +1: have the GUI cache text textures and generally have very good speed / performance
+ - 6: Implement accurate simulation of 3D rotation in Class SceneObject. 
    Implementing Class Quaternion advised.
  - 3: Implement sphere-based collision-detection. 
-   +1p: Implement convex-object collision detection.
+   +3p: Implement convex-object collision detection.
  - 3: Have the Scene set-up be described in a text file, and loaded. 
    Replace the scene-related set-up in Engine::Engine() with a call to Engine::loadScene(string fileName)
  - 3: make the Moon object look round by adjusting its normals. 
    Advice: creating a high-poly sphere to transfer the normals to the low-poly object 
    might be required (i.e. baking normals). 
    +1p: Create multiple 3d object files and textures. Load them and populate the scene with them.
- - 3: Create a day-night cycle by adding a star (moving object and light).
+ - 3: Create a 'day-night' cycle by adding a star (moving object and light).
 
-If choosing a 3 point task, you can also choose a 1 point general task, 
+If choosing a 3+ point task, you can also choose a 1 point general task, 
   even if both cover the same area of the program.
 
 If you have a program of equivalent complexity that have written yourself,
