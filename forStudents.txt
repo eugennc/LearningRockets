@@ -58,6 +58,7 @@ Unique tasks: these tasks require modifying the project. They are valued between
  - 6: Create a GUI showing detailed orbital information:
    relative distances, speeds, projecting the orbit forwards and backwards in time, Apoapsis, Periapsis. 
    +1: have the GUI cache text textures and generally have very good speed / performance
+   +1: have the projected trajectories be stable (numerically-stable simulation)
  - 6: Implement accurate simulation of 3D rotation in Class SceneObject. 
    Implementing Class Quaternion advised.
  - 3: Implement sphere-based collision-detection. 
